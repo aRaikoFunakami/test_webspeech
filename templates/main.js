@@ -1,62 +1,84 @@
-const utterances = [];
-const eventSources = [];
 
-function handleSpeechEnd(event) {
-	const utterance = event.target;
-	const finish = utterance.finish;
-	var answerElement = document.getElementById("answer");
-	answerElement.innerHTML = answerElement.innerHTML + `<div>utterance.data:${finish}</div>`;
-	if(finish == "stop"){
-		setTimeout(()=>{ answerElement.innerHTML="";}, 1000);
+class SpeechHandler {
+	constructor() {
+		this.utterances = [];
+	}
+
+	handleSpeechEnd(event) {
+		const utterance = event.target;
+		const finish = utterance.finish;
+		console.log(`utterance.data: ${finish}`);
+		if (finish === "stop") {
+			setTimeout(() => {
+				this.answerElement.innerHTML = "";
+			}, 1000);
+		}
+	}
+
+	speakUtterance(text, data) {
+		const utterance = new SpeechSynthesisUtterance(text);
+		utterance.finish = data;
+		utterance.onend = this.handleSpeechEnd.bind(this);
+		this.utterances.push(utterance);
+		speechSynthesis.speak(utterance);
+	}
+
+	cancelAllSpeeches() {
+		this.utterances.forEach((utterance) => {
+			console.log(`Cancel audio output: ${utterance.text}`);
+			speechSynthesis.cancel();
+		});
 	}
 }
 
-function speakUtterance(text, data) {
-	const utterance = new SpeechSynthesisUtterance(text);
-	utterance.finish = data; // データを関連付ける
-	utterance.onend = handleSpeechEnd;
-	utterances.push(utterance);
-	speechSynthesis.speak(utterance);
-}
+class NetworkHandler {
+	constructor() {
+		this.eventSources = [];
+		this.speechHandlers = [];
+	}
 
+	cancelAllConnections() {
+		this.eventSources.forEach((eventSource) => {
+			if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
+				console.log(`Cancel network connection: ${eventSource.url}`);
+				eventSource.close();
+			}
+		});
+		this.speechHandlers.forEach((handler) => {
+			handler.cancelAllSpeeches();
+		});
+	}
 
-function cancelAllSpeeches() {
-	utterances.forEach(utterance => {
-		console.log(`Cancel audio output: ${utterance.text}`);
-		speechSynthesis.cancel();
-	});
-}
+	handleEventSourceMessage(event) {
+		const jsonData = JSON.parse(event.data);
+		const text = jsonData.response;
+		const type = jsonData.type;
+		const finish = jsonData.finish_reason;
+		console.log(`text: ${text}, type: ${type}, finish: ${finish}`);
+		const speechHandler = new SpeechHandler();
+		this.speechHandlers.push(speechHandler);
+		speechHandler.speakUtterance(text, finish);
+	}
 
-function cancelAllConnections() {
-	eventSources.forEach(eventSource => {
-		if (eventSource && eventSource.readyState !== EventSource.CLOSED) {
-			console.log(`Cancel network connectionb: ${eventSource.url}`);
-			eventSource.close();
-		}
-	});
+	setupEventSource() {
+		const eventSource = new EventSource(`http://127.0.0.1:8001/input`);
+		this.eventSources.push(eventSource);
+		eventSource.onmessage = this.handleEventSourceMessage.bind(this);
+	}
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-	var myButton = document.getElementById("myButton");
-	var cancelButton = document.getElementById("cancelButton");
-	var answerElement = document.getElementById("answer");
+	const myButton = document.getElementById("myButton");
+	const cancelButton = document.getElementById("cancelButton");
+	const answerElement = document.getElementById("answer");
+
+	const networkHandler = new NetworkHandler();
 
 	myButton.addEventListener("click", function () {
-		const eventSource = new EventSource(`http://127.0.0.1:8001/input`);
-		eventSources.push(eventSource);
-
-		eventSource.onmessage = function (event) {
-			const jsonData = JSON.parse(event.data);
-			const text = jsonData.response;
-			const type = jsonData.type;
-			const finish = jsonData.finish_reason;
-			answerElement.innerHTML = answerElement.innerHTML + `<div>text: ${text}, type: ${type}, finish: ${finish}</dev>`;
-			speakUtterance(text, finish)
-		}
+		networkHandler.setupEventSource();
 	});
 
 	cancelButton.addEventListener("click", function () {
-		cancelAllSpeeches();
-		cancelAllConnections();
+		networkHandler.cancelAllConnections();
 	});
 });
