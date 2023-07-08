@@ -3,7 +3,8 @@
 class NetworkHandler {
 	constructor(answerElement) {
 		this.eventSources = [];
-		this.speechHandler = new SpeechHandler();
+		//this.speechHandler = new SpeechHandler();
+		this.speechHandler = new SpeechHandlerZundamon();
 	}
 
 	cancelAllConnections() {
