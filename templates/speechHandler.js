@@ -1,8 +1,7 @@
 // speechHandler.js
 
 class SpeechHandler {
-	constructor(answerElement) {
-		this.answerElement = answerElement;
+	constructor() {
 		this.utterances = [];
 	}
 
