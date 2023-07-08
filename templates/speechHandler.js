@@ -9,10 +9,10 @@ class SpeechHandler {
 	handleSpeechEnd(event) {
 		const utterance = event.target;
 		const finish = utterance.finish;
-		console.log(`<div>utterance.data: ${finish}</div>`);
+		console.log(`utterance.finish: ${finish}`);
 		if (finish === "stop") {
 			setTimeout(() => {
-				this.answerElement.innerHTML = "";
+				console.log('handleSpeechEnd:finish === "stop"')
 			}, 1000);
 		}
 	}

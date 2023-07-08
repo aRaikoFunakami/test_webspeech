@@ -24,7 +24,7 @@ class NetworkHandler {
 		const text = jsonData.response;
 		const type = jsonData.type;
 		const finish = jsonData.finish_reason;
-		console.log(`<div>text: ${text}, type: ${type}, finish: ${finish}</div>`);
+		console.log(`text: ${text}, type: ${type}, finish: ${finish}`);
 		const speechHandler = new SpeechHandler(this.answerElement);
 		this.speechHandlers.push(speechHandler);
 		speechHandler.speakUtterance(text, finish);
