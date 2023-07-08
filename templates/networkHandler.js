@@ -3,8 +3,7 @@
 class NetworkHandler {
 	constructor(answerElement) {
 		this.eventSources = [];
-		this.speechHandlers = [];
-		this.answerElement = answerElement;
+		this.speechHandler = new SpeechHandler();
 	}
 
 	cancelAllConnections() {
@@ -14,9 +13,7 @@ class NetworkHandler {
 				eventSource.close();
 			}
 		});
-		this.speechHandlers.forEach((handler) => {
-			handler.cancelAllSpeeches();
-		});
+		this.speechHandler.cancelAllSpeeches();
 	}
 
 	handleEventSourceMessage(event) {
@@ -25,9 +22,7 @@ class NetworkHandler {
 		const type = jsonData.type;
 		const finish = jsonData.finish_reason;
 		console.log(`text: ${text}, type: ${type}, finish: ${finish}`);
-		const speechHandler = new SpeechHandler(this.answerElement);
-		this.speechHandlers.push(speechHandler);
-		speechHandler.speakUtterance(text, finish);
+		this.speechHandler.speak(text, finish === "stop");
 	}
 
 	setupEventSource() {

@@ -12,24 +12,24 @@ import json
 app = Flask(__name__, static_folder='./templates', static_url_path='')
 
 texts = [
-    "This is the first text.",
-    "Here comes the second one.",
-    "The third text is ready.",
-    "Let's move on to the fourth.",
-    "Fifth text is on its way.",
-    "Sixth text is here.",
-    "Seventh text reporting in.",
-    "Eighth text says hello.",
-    "The ninth text has arrived.",
-    "Tenth and final text.",
+    "In JavaScript, arrays can be accessed using square brackets [], and objects can be defined using curly braces {}.",
+    "新しい日が明け、風は爽やかに吹く。人々は笑顔で歩き、夢を追いかける！",
+    "新的一天开始了，微风轻拂。人们笑容满面，追逐梦想！",
 ]
 
 def dummy_chatGPT(callback):
-    for i in texts:
-        message = { 'response': i, 'type': None, 'finish_reason': None}
+    joined_text = ' '.join(texts)
+    words = joined_text.split()
+
+    index = 0
+    for i in words:
+        message = {'response': i, 'type': None, 'finish_reason': None}
         callback(json.dumps(message))
-        time.sleep(1)
-    message = { 'response': i, 'type': None, 'finish_reason': 'stop'}
+        index = index + 1
+        if index % 4 == 0:
+            time.sleep(1)
+
+    message = {'response': '', 'type': None, 'finish_reason': 'stop'}
     callback(json.dumps(message))
     return
 
