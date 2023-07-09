@@ -53,7 +53,7 @@ class SpeechHandler {
 		this.text += text + ' ';
 		while (true) {
 			const [firstPart, restPart] = splitTextByDelimiters(this.text, this.delimiters);
-			console.log(`firstPart:${firstPart}, restPart:${restPart}(${restPart == ""}})`);
+			//console.log(`firstPart:${firstPart}, restPart:${restPart}(${restPart == ""}})`);
 
 			// Buffer is empty, but speak is called again
 			if (restPart == "" && isStop != true) {

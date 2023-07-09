@@ -22,7 +22,7 @@ class NetworkHandler {
 		const text = jsonData.response;
 		const type = jsonData.type;
 		const finish = jsonData.finish_reason;
-		console.log(`text: ${text}, type: ${type}, finish: ${finish}`);
+		console.log(`NetworkHandler.handleEventSourceMessage text: ${text}, type: ${type}, finish: ${finish}`);
 		this.speechHandler.speak(text, finish === "stop");
 	}
 
