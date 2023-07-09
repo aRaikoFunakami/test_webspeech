@@ -2,10 +2,8 @@ class SpeechRecognitionHandler {
 	constructor() {
 		this.recognition = null;
 		this.isSpeechRecognizing = false;
-		this.isCanceledSpeechRecognition = false;
-		this.zundamon_speaking = false;
-		this.zundamon_controller = null;
-		this.eventSource = null;
+
+		//handlers
 		this.updateStatusHandler = null;
 		this.cancelHandler = null;
 	}
@@ -40,7 +38,6 @@ class SpeechRecognitionHandler {
 			let is_final = false;
 
 			video.muted = false;
-			if (this.isCanceledSpeechRecognition) return;
 			console.log(
 				"resultIndex[]:" + event.resultIndex + " " + event.results.length
 			);
@@ -66,7 +63,6 @@ class SpeechRecognitionHandler {
 			return;
 
 		this.isSpeechRecognizing = true;
-		this.isCanceledSpeechRecognition = false;
 		//microphone.style.filter = "brightness(0%) sepia(1000%) hue-rotate(0deg)";
 		video.muted = true;
 
@@ -89,7 +85,6 @@ class SpeechRecognitionHandler {
 		if (this.isSpeechRecognizing) {
 			console.log("Cancel Speech Recognition");
 			this.recognition.stop();
-			this.isCanceledSpeechRecognition = true;
 			this.updateStatusHandler("Cancel Speech Recognition.", 1);
 			this.cancelHandler();
 			return;
