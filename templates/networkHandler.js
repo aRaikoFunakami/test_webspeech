@@ -1,7 +1,7 @@
 // networkHandler.js
 
 class NetworkHandler {
-	constructor(answerElement) {
+	constructor() {
 		this.eventSources = [];
 		//this.speechHandler = new SpeechHandler();
 		this.speechHandler = new SpeechHandlerZundamon();
