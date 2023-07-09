@@ -13,7 +13,7 @@ app = Flask(__name__, static_folder='./templates', static_url_path='')
 
 texts = [
     #"In JavaScript, arrays can be accessed using square brackets [], and objects can be defined using curly braces {}.",
-    "新しい日が明け、 風は爽やかに吹く。 人々は笑顔で歩き、 夢を追いかける！",
+    #"新しい日が明け、 風は爽やかに吹く。 人々は笑顔で歩き、 夢を追いかける！",
     #"新的一天开始了，微风轻拂。人们笑容满面，追逐梦想！",
 ]
 
@@ -36,6 +36,8 @@ def dummy_chatGPT(callback):
 @app.route('/input', methods=["GET"])
 def input():
     logging.info(request)
+    input = request.args['text']
+    texts.append(input)
     qa_stream = queue.Queue()
     def dummy_callback(response=None):
         qa_stream.put(response)
