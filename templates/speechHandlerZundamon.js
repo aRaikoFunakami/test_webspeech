@@ -13,7 +13,7 @@ class SpeechHandlerZundamon {
 		console.log(`handleSpeechEnd: [${e.isStop}] ${e.text}`);
 	}
 
-	speak(text, isStop) {
+	speak(text, isStop, lang) {
 		console.log(`SpeechHandlerZundamon.speak ${text}, ${isStop}, (${this.player}, ${this.abortController})`)
 		this.text += text + ' ';
 		while (true) {

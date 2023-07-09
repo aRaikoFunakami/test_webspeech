@@ -41,15 +41,32 @@ class SpeechHandler {
 		console.log(`utterance.finish: ${isStop}`);
 	}
 
-	speakUtterance(text, isStop) {
+	speakUtterance(text, isStop, lang) {
 		const utterance = new SpeechSynthesisUtterance(text);
 		utterance.isStop = isStop;
 		utterance.onend = this.handleSpeechEnd.bind(this);
+		//
+		// Ugh!: hard coding...
+		// language setting before speak
+		//
+		console.log(`SpeechHandler.speakUtterance ${lang}`)
+		var voices = speechSynthesis.getVoices()
+		if (lang == 'en-US') {
+			utterance.lang = 'en-US';
+			//utterThis.voice = voices[39]; // en-US:Fred
+			utterance.voice = voices[145]; // en-US:Google US English Female
+			//utterThis.voice = voices[146]; // en-GB:Google UK English Female
+			utterance.rate = 0.9;
+		} else if (lang == 'zh-CN') {
+			utterance.lang = 'zh-CN';
+			utterance.voice = voices[169]; // zh-CN: Google 普通話
+			utterance.rate = 0.9;
+		}
 		this.utterances.push(utterance);
 		speechSynthesis.speak(utterance);
 	}
 
-	speak(text, isStop) {
+	speak(text, isStop, lang) {
 		this.text += text + ' ';
 		while (true) {
 			const [firstPart, restPart] = splitTextByDelimiters(this.text, this.delimiters);
@@ -62,9 +79,9 @@ class SpeechHandler {
 
 			// If there is still data to read, call isStop with false
 			if (restPart != "") {
-				this.speakUtterance(firstPart, false);
+				this.speakUtterance(firstPart, false, lang);
 			} else {
-				this.speakUtterance(firstPart, isStop);
+				this.speakUtterance(firstPart, isStop, lang);
 			}
 
 			// If there is data left to read, repeat again.

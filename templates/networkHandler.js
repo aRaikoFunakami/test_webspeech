@@ -3,8 +3,9 @@
 class NetworkHandler {
 	constructor() {
 		this.eventSources = [];
-		//this.speechHandler = new SpeechHandler();
-		this.speechHandler = new SpeechHandlerZundamon();
+		this.speechHandler = new SpeechHandler();
+		//this.speechHandler = new SpeechHandlerZundamon();
+		this.lang = null;
 	}
 
 	cancelAllConnections() {
@@ -23,10 +24,11 @@ class NetworkHandler {
 		const type = jsonData.type;
 		const finish = jsonData.finish_reason;
 		console.log(`NetworkHandler.handleEventSourceMessage text: ${text}, type: ${type}, finish: ${finish}`);
-		this.speechHandler.speak(text, finish === "stop");
+		this.speechHandler.speak(text, finish === "stop", this.lang);
 	}
 
-	setupEventSource() {
+	setupEventSource(lang = 'ja-JP') {
+		this.lang = lang;
 		const eventSource = new EventSource(`http://127.0.0.1:8001/input`);
 		this.eventSources.push(eventSource);
 		eventSource.onmessage = this.handleEventSourceMessage.bind(this);
