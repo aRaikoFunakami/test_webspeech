@@ -27,9 +27,9 @@ class NetworkHandler {
 		this.speechHandler.speak(text, finish === "stop", this.lang);
 	}
 
-	setupEventSource(lang = 'ja-JP') {
+	setupEventSource(text, lang = 'ja-JP') {
 		this.lang = lang;
-		const eventSource = new EventSource(`http://127.0.0.1:8001/input`);
+		const eventSource = new EventSource(`http://127.0.0.1:8001/input?text=${encodeURIComponent(text)}`);
 		this.eventSources.push(eventSource);
 		eventSource.onmessage = this.handleEventSourceMessage.bind(this);
 	}

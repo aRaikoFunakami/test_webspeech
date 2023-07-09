@@ -17,9 +17,14 @@ texts = [
     #"新的一天开始了，微风轻拂。人们笑容满面，追逐梦想！",
 ]
 
-def dummy_chatGPT(callback):
-    joined_text = ' '.join(texts)
+def dummy_chatGPT(callback, response = None):
+    if(response is None):
+        joined_text = ' '.join(texts)
+    else:
+        joined_text = ' '.join(response)
+
     words = joined_text.split()
+    print(words)
 
     index = 0
     for i in words:
@@ -37,12 +42,13 @@ def dummy_chatGPT(callback):
 def input():
     logging.info(request)
     input = request.args['text']
-    texts.append(input)
+    dummy_response = []
+    dummy_response.append(input)
     qa_stream = queue.Queue()
     def dummy_callback(response=None):
         qa_stream.put(response)
 
-    producer_thread = threading.Thread(target=dummy_chatGPT, args=(dummy_callback,))
+    producer_thread = threading.Thread(target=dummy_chatGPT, args=(dummy_callback, dummy_response, ))
     producer_thread.start()
 
     def stream():

@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	let lang = 'ja-JP';
 
 	myButton.addEventListener("click", function () {
-		networkHandler.setupEventSource(lang);
+		networkHandler.setupEventSource('横浜の天気 晴天', lang);
 	});
 
 	cancelButton.addEventListener("click", function () {
@@ -59,6 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	speechRecognitionHandler.recognizedHandler = function(text){
 		console.log('speechRecognitionHandler.recognizedHandler ');
-		updateStatus('Recognized text:' + text, 2);
+		networkHandler.setupEventSource(text, lang);
 	}
 });
