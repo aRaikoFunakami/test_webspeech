@@ -52,8 +52,13 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	// Cancels processing other than speech recognition, network processing, voice playback processing, etc.
-	speechRecognitionHandler.cancelHandler = function(){
+	speechRecognitionHandler.canceledHandler = function(){
 		console.log('speechRecognitionHandler.cancelHandler');
 		networkHandler.cancelAllConnections();
+	}
+
+	speechRecognitionHandler.recognizedHandler = function(text){
+		console.log('speechRecognitionHandler.recognizedHandler ');
+		updateStatus('Recognized text:' + text, 2);
 	}
 });
