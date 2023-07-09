@@ -54,6 +54,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	// Cancels processing other than speech recognition, network processing, voice playback processing, etc.
 	speechRecognitionHandler.cancelHandler = function(){
 		console.log('speechRecognitionHandler.cancelHandler');
-		etworkHandler.cancelAllConnections();
+		NetworkHandler.cancelAllConnections();
 	}
 });
