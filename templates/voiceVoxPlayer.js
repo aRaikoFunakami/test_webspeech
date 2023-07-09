@@ -2,12 +2,13 @@ class VoiceVoxPlayer {
 	constructor() {
 		this.audioPlayQueue = Promise.resolve();
 		this.audioGenerationQueue = [];
-		this.abortController = null;
+		this.abortController = new AbortController(); ;
+		this.audioEndedHandler = null;
 	}
 
 	playAudio(
 		textData,
-		callback = null,
+		isStop,
 		audioQueryUrl = "http://127.0.0.1:50021/audio_query?speaker=1",
 		synthesisUrl = "http://127.0.0.1:50021/synthesis?speaker=1"
 	) {
@@ -46,42 +47,51 @@ class VoiceVoxPlayer {
 			.catch(error => {
 				console.error("音声生成エラー:", error);
 			});
+		this.audioGenerationQueue.push([audioGeneration, textData, isStop]);
+		this.processAudioQueue();
+	}
 
-		this.audioGenerationQueue.push(audioGeneration);
+	processAudioQueue() {
+		this.audioPlayQueue = this.audioPlayQueue
+			.then(() => {
+				let [nextAudio, textData, isStop] = this.audioGenerationQueue.shift();
+				return nextAudio.then(audio =>
+					new Promise((resolve, reject) => {
+						const handleAbort = () => {
+							audio.pause();
+							audio.src = "";
+							audio.onended = null;
+							URL.revokeObjectURL(audio.src);
+							reject(new DOMException("Audio playback aborted", "AbortError"));
+						};
 
-		this.audioPlayQueue = this.audioPlayQueue.then(() => {
-			let nextAudio = this.audioGenerationQueue.shift();
-			return nextAudio.then(audio =>
-				new Promise((resolve, reject) => {
-					const handleAbort = () => {
-						audio.pause();
-						audio.src = "";
-						audio.onended = null;
-						URL.revokeObjectURL(audio.src);
-						reject(new DOMException("Audio playback aborted", "AbortError"));
-					};
+						this.abortController.signal.addEventListener("abort", handleAbort);
 
-					this.abortController.signal.addEventListener("abort", handleAbort);
-
-					audio.onended = () => {
-						this.abortController.signal.removeEventListener("abort", handleAbort);
-						if (this.audioGenerationQueue.length === 0 && callback) {
-							callback();
-						}
-						resolve();
-					};
-					audio.play().catch(reject);
-				})
-			);
-		}).catch(error => {
-			console.error("再生エラー:", error);
-		});
+						audio.onended = () => {
+							console.log(`audio.onended ${this.audioEndedHandler}, ${textData}`);
+							const e = {
+								text: textData,
+								isStop: isStop,
+							};
+							if (this.audioEndedHandler) {
+								this.audioEndedHandler(e); // イベントハンドラを呼び出す
+							}
+							resolve();
+						};
+						audio.play().catch(reject);
+					})
+				);
+			})
+			.catch(error => {
+				console.error("再生エラー:", error);
+			});
 	}
 
 	abort() {
 		if (this.abortController) {
 			this.abortController.abort();
 			this.abortController = null;
+			this.abortController = new AbortController(); 
 		}
 	}
 }

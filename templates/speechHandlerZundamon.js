@@ -3,19 +3,18 @@
 class SpeechHandlerZundamon {
 	constructor() {
 		this.player = new VoiceVoxPlayer();
+		this.player.audioEndedHandler = this.handleSpeechEnd;
 		this.abortController = new AbortController();
-		//this.utterances = [];
 		this.text = "";
 		this.delimiters = [',', '.', '!', ':', ';', '?', '{', '}', '[', ']', '！', '？', '：', '；', '　', '。', '、',];
 	}
 
-	handleSpeechEnd(event) {
-		const utterance = event.target;
-		const isStop = utterance.isStop;
-		console.log(`utterance.finish: ${isStop}`);
+	handleSpeechEnd(e) {
+		console.log(`handleSpeechEnd: [${e.isStop}] ${e.text}`);
 	}
 
 	speak(text, isStop) {
+		console.log(`SpeechHandlerZundamon.speak ${text}, ${isStop}, (${this.player}, ${this.abortController})`)
 		this.text += text + ' ';
 		while (true) {
 			const [firstPart, restPart] = splitTextByDelimiters(this.text, this.delimiters);
@@ -28,14 +27,9 @@ class SpeechHandlerZundamon {
 
 			// If there is still data to read, call isStop with false
 			if (restPart != "") {
-				//this.speakUtterance(firstPart, false);
-				this.player.playAudio(firstPart);
+				this.player.playAudio(firstPart, false);
 			} else {
-				//this.speakUtterance(firstPart, isStop);
-				this.player.playAudio(firstPart);
-				//
-				// isStopのサポートを行う
-				//
+				this.player.playAudio(firstPart, isStop);
 			}
 
 			// If there is data left to read, repeat again.
